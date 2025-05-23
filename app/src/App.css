@@ -1,0 +1,127 @@
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app {
+  display: grid;
+  grid-template-areas:
+    "sidebar main"
+    "player player";
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 1fr 60px;
+  height: 100%;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background-color: #0f172a;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  color: #00ffff;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar nav a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sidebar nav a:hover {
+  color: white;
+}
+
+.main {
+  grid-area: main;
+  background-color: #1e293b;
+  color: white;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.header input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #334155;
+  color: white;
+}
+
+.content h1 {
+  color: #00ffff;
+  font-size: 28px;
+  margin: 0 0 10px;
+}
+
+.player {
+  grid-area: player;
+  background-color: #0f172a;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+.nav-link {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: white;
+}
+.song-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.song-card {
+  background: #111;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 150px;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.song-card:hover {
+  background: #1c1c1c;
+}
+
+.song-card img {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.song-card p {
+  font-size: 0.9rem;
+  color: #fff;
+  margin-top: 0.5rem;
+}
