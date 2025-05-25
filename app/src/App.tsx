@@ -1,13 +1,12 @@
 // src/App.tsx
 import React, { useState } from 'react';
 import './App.css';
-import Player from './components/player'; // Import the Player component
-import { Song } from './types'; // Import the Song interface
-
+import Player from './components/player';
+import { Song } from './types';
 function App() {
   const [query, setQuery] = useState<string>('');
-  const [songs, setSongs] = useState<Song[]>([]); // Type songs array
-  const [currentSong, setCurrentSong] = useState<Song | null>(null); // Type currentSong
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [audioSrc, setAudioSrc] = useState<string>('');
 
   const handleSearch = async () => {
@@ -16,23 +15,23 @@ function App() {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      const data: Song[] = await res.json(); // Explicitly type the incoming data
+      const data: Song[] = await res.json();
       setSongs(data);
     } catch (error) {
       console.error("Error fetching search results:", error);
-      setSongs([]); // Clear songs on error
+      setSongs([]);
     }
   };
 
-  const playSong = async (song: Song) => { // Type the song parameter
+  const playSong = async (song: Song) => {
     try {
-      setCurrentSong(song); // Set the current song immediately
+      setCurrentSong(song);
       const res = await fetch(`http://localhost:5000/api/stream?videoId=${song.videoId}`);
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      const streamData: { streamUrl: string } = await res.json(); // Type streamData
-      setAudioSrc(streamData.streamUrl);
+      const streamData: { streamUrl: string } = await res.json();
+      setAudioSrc(streamData.streamUrl); // This will trigger player rendering and audio loading
     } catch (error) {
       console.error("Error streaming song:", error);
       setAudioSrc(''); // Clear audio source on error
@@ -67,7 +66,7 @@ function App() {
           <p>Your personalized music experience</p>
           <div className="song-list">
             {songs.length > 0 ? (
-              songs.map((song: Song) => ( // Type song in map callback
+              songs.map((song: Song) => (
                 <div key={song.videoId} className="song-card" onClick={() => playSong(song)}>
                   <img src={song.thumbnail} alt={song.title} />
                   <p>{song.title}</p>
@@ -80,8 +79,7 @@ function App() {
         </section>
       </main>
 
-      {/* Render the new Player component */}
-      <Player currentSong={currentSong} audioSrc={audioSrc} />
+      {audioSrc && <Player currentSong={currentSong} audioSrc={audioSrc} />}
     </div>
   );
 }

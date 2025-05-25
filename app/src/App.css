@@ -3,6 +3,13 @@ body, html, #root {
   padding: 0;
   height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #602379 0%, #000428 100%);
+  /* background-image: url('https://images.unsplash.com/photo-1616356601595-8af46b090cc4?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  */
+  overflow: hidden; /* Prevent scrollbars on body due to fixed player */
 }
 
 .app {
@@ -10,118 +17,196 @@ body, html, #root {
   grid-template-areas:
     "sidebar main"
     "player player";
-  grid-template-columns: 240px 1fr;
-  grid-template-rows: 1fr 60px;
-  height: 100%;
+  grid-template-columns: 250px 1fr; 
+  grid-template-rows: 1fr auto; 
+  height: 100vh; 
+  gap: 10px; 
+  padding: 10px; 
+  box-sizing: border-box;
 }
 
 .sidebar {
   grid-area: sidebar;
-  background-color: #0f172a;
+  background-color: rgba(255, 255, 255, 0.1); 
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px); 
   color: white;
-  padding: 20px;
+  padding: 25px;
+  border-radius: 15px; 
+  border: 1px solid rgba(255, 255, 255, 0.2); 
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2); 
   display: flex;
   flex-direction: column;
 }
 
 .sidebar h2 {
   margin-top: 0;
-  color: #00ffff;
+  color: #00e1ff; 
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(0, 225, 255, 0.5); /* Subtle glow */
 }
 
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px; /* Increased gap */
+  margin-top: 20px;
 }
 
-.sidebar nav a {
-  color: #94a3b8;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.sidebar nav a:hover {
-  color: white;
-}
-
-.main {
-  grid-area: main;
-  background-color: #1e293b;
-  color: white;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.header {
-  margin-bottom: 20px;
-}
-
-.header input {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  background-color: #334155;
-  color: white;
-}
-
-.content h1 {
-  color: #00ffff;
-  font-size: 28px;
-  margin: 0 0 10px;
-}
-
-.player {
-  grid-area: player;
-  background-color: #0f172a;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
 .nav-link {
-  background: none;
+  background: transparent;
   border: none;
-  color: #94a3b8;
-  font-size: 1rem;
+  color: #c0c0c0; 
+  font-size: 1.05rem;
   text-align: left;
-  padding: 0;
+  padding: 10px 15px;
   cursor: pointer;
   font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease; 
+  display: flex;
+  align-items: center;
 }
 
 .nav-link:hover {
   color: white;
+  background-color: rgba(255, 255, 255, 0.15); 
+  box-shadow: 0 0 10px rgba(0, 225, 255, 0.3);
 }
+
+.main {
+  grid-area: main;
+  background-color: rgba(255, 255, 255, 0.08); 
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color: white;
+  padding: 25px;
+  overflow-y: auto; 
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+}
+
+.main::-webkit-scrollbar {
+  width: 8px;
+}
+.main::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+.main::-webkit-scrollbar-thumb {
+  background: rgba(0, 225, 255, 0.6);
+  border-radius: 10px;
+}
+.main::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 225, 255, 0.8);
+}
+
+
+.header {
+  margin-bottom: 25px;
+  display: flex; 
+  gap: 10px;
+}
+
+.header input[type="text"] {
+  flex-grow: 1; 
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.2); 
+  backdrop-filter: blur(5px); 
+  -webkit-backdrop-filter: blur(5px);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.header input[type="text"]::placeholder {
+  color: #a0a0a0;
+}
+
+.header input[type="text"]:focus {
+  border-color: #00e1ff;
+  box-shadow: 0 0 15px rgba(0, 225, 255, 0.5);
+}
+
+.header button {
+  padding: 12px 20px;
+  border: 1px solid #00e1ff;
+  border-radius: 8px;
+  background: linear-gradient(145deg, rgba(0, 225, 255, 0.3), rgba(0, 196, 255, 0.5)); /* Gradient for shine */
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(0, 225, 255, 0.3);
+}
+
+.header button:hover {
+  background: linear-gradient(145deg, rgba(0, 225, 255, 0.5), rgba(0, 196, 255, 0.7));
+  box-shadow: 0 0 15px rgba(0, 225, 255, 0.7);
+  transform: translateY(-1px); 
+}
+
+
+.content h1 {
+  color: #00e1ff;
+  font-size: 32px; 
+  margin: 0 0 15px;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 225, 255, 0.4);
+}
+
+.content p {
+  font-size: 1.1rem;
+  color: #d0d0d0; 
+  margin-bottom: 20px;
+}
+
 .song-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .song-card {
-  background: #111;
-  padding: 0.5rem;
-  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.3); 
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
-  width: 150px;
   text-align: center;
-  transition: 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0, 0.3);
 }
 
 .song-card:hover {
-  background: #1c1c1c;
+  transform: translateY(-5px) scale(1.03); 
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 225, 255, 0.3); 
+  border-color: rgba(0, 225, 255, 0.5);
 }
 
 .song-card img {
   width: 100%;
-  border-radius: 4px;
+  aspect-ratio: 1 / 1; 
+  object-fit: cover;
+  border-radius: 8px; 
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .song-card p {
-  font-size: 0.9rem;
-  color: #fff;
+  font-size: 0.95rem;
+  color: #e0e0e0;
   margin-top: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
