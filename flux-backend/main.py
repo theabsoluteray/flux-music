@@ -20,7 +20,7 @@ def search():
     }
 
     with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f"ytsearch10:{query}", download=False)
+        info = ydl.extract_info(f"ytsearch1:{query}", download=False)
         entries = info.get('entries', [])
         results = []
         for entry in entries:

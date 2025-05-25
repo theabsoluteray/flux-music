@@ -22,9 +22,9 @@ function createWindow() {
 
 // Start backend server
 function startBackend() {
-  const backendPath = path.join(__dirname, '/flux-backend/app.js');
+  const backendPath = path.join(__dirname, '/flux-backend/main.py');
 
-  backendProcess = spawn('node', [backendPath], {
+  backendProcess = spawn('python3', [backendPath], {
     stdio: 'inherit',
     shell: true,
   });
