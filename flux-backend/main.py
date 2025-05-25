@@ -16,7 +16,7 @@ def search():
         'noplaylist': True,
         'quiet': True,
         'default_search': 'ytsearch',
-        'extract_flat': False  
+        'extract_flat': True 
     }
 
     with YoutubeDL(ydl_opts) as ydl:
