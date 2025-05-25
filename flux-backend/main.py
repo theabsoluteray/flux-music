@@ -1,63 +1,61 @@
-import vlc
-import time
-import yt_dlp
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from yt_dlp import YoutubeDL
 
-def get_youtube_audio_url(youtube_url):
+app = Flask(__name__)
+CORS(app)  # 
+
+@app.route('/api/search')
+def search():
+    query = request.args.get('query', '')
+    if not query:
+        return jsonify([])
+
     ydl_opts = {
-        'format': 'bestaudio/best',  
-        'noplaylist': True,          
-        'quiet': True,              
+        'format': 'bestaudio/best',
+        'noplaylist': True,
+        'quiet': True,
         'default_search': 'ytsearch',
-        'extract_flat': True,        
+        'extract_flat': 'in_playlist'
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        try:
-            info_dict = ydl.extract_info(youtube_url, download=False)
-            
-            if 'entries' in info_dict: 
-                audio_url = info_dict['entries'][0]['url']
-            else:
-                audio_url = info_dict['url']
-            return audio_url
-        except Exception as e:
-            print(f"Error fetching audio URL: {e}")
-            return None
-
-def play_audio_stream(stream_url):
-    if not stream_url:
-        print("No stream URL provided.")
-        return
-
-    try:
-        instance = vlc.Instance('--no-video')
-        player = instance.media_player_new()
-        media = instance.media_new(stream_url)
-        player.set_media(media)
-
-        player.play()
-
-        while True:
-            state = player.get_state()
-            if state == vlc.State.Ended or state == vlc.State.Error:
-                break
-            time.sleep(1) 
-
-        player.stop()
-        print("Playback finished.")
-
-    except Exception as e:
-        print(f"Error playing audio stream: {e}")
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(f"ytsearch10:{query}", download=False)
+        entries = info.get('entries', [])
+        results = []
+        for entry in entries:
+            if 'id' in entry:
+                results.append({
+                    'title': entry.get('title'),
+                    'videoId': entry['id'],
+                    'thumbnail': f"https://i.ytimg.com/vi/{entry['id']}/hqdefault.jpg"
+                })
+        return jsonify(results)
 
 
-def play_youtube_audio(query_or_url):
-    print(f"Searching for and streaming: {query_or_url}")
-    audio_url = get_youtube_audio_url(query_or_url)
-    if audio_url:
-        print(f"Found audio stream URL: {audio_url}")
-        play_audio_stream(audio_url)
-    else:
-        print("Could not find an audio stream for the given input.")
+@app.route('/api/stream')
+def stream():
+    video_id = request.args.get('videoId')
+    if not video_id:
+        return jsonify({'error': 'Missing videoId'}), 400
+
+    url = f'https://www.youtube.com/watch?v={video_id}'
+
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'quiet': True,
+        'no_warnings': True,
+    }
+
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        stream_url = info['url']
+        return jsonify({'streamUrl': stream_url})
 
 
-play_youtube_audio("https://www.youtube.com/watch?v=9Zj0JOHJR-s&pp=ygUQbXkgb3JkaW5hcnkgbGlmZQ%3D%3D") # Direct URL
+@app.route('/')
+def index():
+    return "Flux Python Backend is Running"
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=5000)

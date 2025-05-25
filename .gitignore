@@ -28,3 +28,4 @@ yarn-error.log*
 ./flux-backend/lib
 ./flux-backend/lib64
 ./flux-backend/include
+./flux-backend/share
