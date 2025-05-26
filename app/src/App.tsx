@@ -8,7 +8,113 @@ const dummyPlaylists = [
   { id: 'pl1', name: 'Good Vibes Only', icon: 'fa-grin-beam' },
   { id: 'pl2', name: 'Indie Anthems', icon: 'fa-guitar' },
   { id: 'pl3', name: 'Workout Beats', icon: 'fa-dumbbell' },
-];
+];// Home Component
+const Home: React.FC = () => {
+  return (
+    <div className="home-page">
+      <h1>Welcome to Flux Music</h1>
+      <div className="featured-section">
+        <h2>Featured Playlists</h2>
+        <div className="playlist-grid">
+          <div className="playlist-card">
+            <div className="playlist-thumbnail">🎵</div>
+            <h3>Today's Hits</h3>
+            <p>The hottest tracks right now</p>
+          </div>
+          <div className="playlist-card">
+            <div className="playlist-thumbnail">🎸</div>
+            <h3>Rock Classics</h3>
+            <p>Timeless rock anthems</p>
+          </div>
+          <div className="playlist-card">
+            <div className="playlist-thumbnail">🎹</div>
+            <h3>Chill Vibes</h3>
+            <p>Relaxing tunes for any mood</p>
+          </div>
+          <div className="playlist-card">
+            <div className="playlist-thumbnail">🎤</div>
+            <h3>Pop Favorites</h3>
+            <p>Your favorite pop hits</p>
+          </div>
+        </div>
+      </div>
+      <div className="recently-played">
+        <h2>Recently Played</h2>
+        <div className="recent-songs">
+          <div className="recent-song">
+            <div className="song-thumbnail">🎵</div>
+            <div className="song-info">
+              <h4>Song Title</h4>
+              <p>Artist Name</p>
+            </div>
+          </div>
+          <div className="recent-song">
+            <div className="song-thumbnail">🎵</div>
+            <div className="song-info">
+              <h4>Another Song</h4>
+              <p>Another Artist</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Library Component
+interface LibraryProps {
+  onPlaySong: (song: Song) => void;
+}
+
+const Library: React.FC<LibraryProps> = ({ onPlaySong }) => {
+  const [savedSongs] = useState<Song[]>([]);
+  return (
+    <div className="library-page">
+      <h1>Your Library</h1>
+      <div className="library-sections">
+        <div className="library-section">
+          <h2>Liked Songs</h2>
+          <div className="library-songs">
+            {savedSongs.length > 0 ? (
+              savedSongs.map((song: Song) => (
+                <div
+                  key={song.videoId}
+                  className="library-song"
+                  onClick={() => onPlaySong(song)}
+                >
+                  <img src={song.thumbnail} alt={song.title} />
+                  <div className="song-info">
+                    <h4>{song.title}</h4>
+                    <p>{song.artist}</p>
+                  </div>
+                  <button className="play-btn">▶️</button>
+                </div>
+              ))
+            ) : (
+              <p>No saved songs yet. Start exploring music!</p>
+            )}
+          </div>
+        </div>
+        <div className="library-section">
+          <h2>Playlists</h2>
+          <div className="playlists">
+            <div className="playlist-item">
+              <div className="playlist-icon">📂</div>
+              <span>My Playlist #1</span>
+            </div>
+            <div className="playlist-item">
+              <div className="playlist-icon">📂</div>
+              <span>Favorites</span>
+            </div>
+            <div className="create-playlist">
+              <button>+ Create New Playlist</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
