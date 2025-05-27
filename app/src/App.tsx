@@ -6,10 +6,25 @@ import { Song } from "./types"; // Path to your types
 import { fetchLyrics } from "./utils/lyricsService"; // Import the lyrics service
 
 const dummyPlaylists = [
-  { id: 'pl1', name: 'Good Vibes Only', icon: 'fa-grin-beam' },
-  { id: 'pl2', name: 'Indie Anthems', icon: 'fa-guitar' },
-  { id: 'pl3', name: 'Workout Beats', icon: 'fa-dumbbell' },
+  { id: "pl1", name: "Good Vibes Only", icon: "fa-grin-beam" },
+  { id: "pl2", name: "Indie Anthems", icon: "fa-guitar" },
+  { id: "pl3", name: "Workout Beats", icon: "fa-dumbbell" },
 ];
+
+// Debounce helper function
+function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  const debounced = (...args: Parameters<F>) => {
+    if (timeout !== null) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    timeout = setTimeout(() => func(...args), waitFor);
+  };
+  return debounced as (...args: Parameters<F>) => ReturnType<F>;
+}
+
+const LIKED_SONGS_STORAGE_KEY = "fluxMusicLikedSongs";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState<string>("");
