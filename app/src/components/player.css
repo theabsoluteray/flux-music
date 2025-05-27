@@ -227,7 +227,7 @@
     #ccc var(--volume-percent, 70%),
     rgba(255, 255, 255, 0.2) var(--volume-percent, 70%),
     rgba(255, 255, 255, 0.2) 100%
-  );
+    );
 }
 .player-volume-slider-integrated::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -440,7 +440,7 @@
   box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.08);
 }
 .player-control-btn-fs.active-control {
-  color: #007aff;
+  color: #60837a;
 }
 .player-control-btn-fs.active-control:hover {
   background-color: rgba(0, 122, 255, 0.1);
@@ -455,13 +455,19 @@
 }
 
 .player-play-pause-btn-fs {
+  font-size: 54px;
+  width: 75px;
+  height: 75px;
+  border-radius: 100px;
+  color: #00ffd5;
+  background-color: rgba(0, 122, 255, 0.1);
   font-size: 50px;
   width: 70px;
   height: 70px;
   color: #007aff;
 }
 .player-play-pause-btn-fs:hover {
-  color: #0090ff;
+  color: #03ff81;
   background-color: rgba(0, 122, 255, 0.08);
 }
 
