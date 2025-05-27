@@ -1,10 +1,12 @@
 /* src/App.css */
-body, html, #root {
+body,
+html,
+#root {
   margin: 0;
   padding: 0;
   height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-               Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   overflow: hidden;
   color: #f0f0f0;
   background-color: #1a1d24; /* Solid background color */
@@ -16,7 +18,7 @@ body, html, #root {
   display: grid;
   grid-template-columns: 70px 280px 1fr;
   grid-template-rows: 1fr;
-  overflow: hidden;
+  overflow: hidden; /* This will clip children to the main window boundaries */
   transition: grid-template-columns 0.3s ease-in-out;
 }
 
@@ -42,10 +44,10 @@ body, html, #root {
 }
 
 .left-sidebar > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
 }
 
 .sidebar-icon-btn {
@@ -61,36 +63,31 @@ body, html, #root {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.3s ease; /* Explicit transitions */
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.3s ease;
   flex-shrink: 0;
-  position: relative; /* For pseudo-elements if ever needed for more complex glows */
+  position: relative;
 }
 
-/* Default hover: white glow */
 .sidebar-icon-btn:hover {
   color: #fff;
   background-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.08); /* Very subtle white glow */
 }
 
-/* Active state: blue glow */
 .sidebar-icon-btn.active {
   color: #fff;
   background-color: rgba(0, 122, 255, 0.7);
   box-shadow: 0 0 8px 1px rgba(0, 122, 255, 0.25); /* Very subtle blue glow for active */
 }
 
-/* Hover on active: enhanced blue glow */
 .sidebar-icon-btn.active:hover {
   background-color: rgba(0, 122, 255, 0.75);
   box-shadow: 0 0 12px 2px rgba(0, 122, 255, 0.3); /* Subtle stronger blue glow */
 }
 
-
 .collapse-toggle-btn {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
-
 
 /* Middle Pane (Library Categories, Playlists) */
 .middle-pane {
@@ -102,9 +99,10 @@ body, html, #root {
   overflow-x: hidden;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   color: #d0d0d0;
-  transition: padding 0.3s ease-in-out, opacity 0.3s ease-in-out, border-right-width 0.3s ease-in-out, border-radius 0.3s ease-in-out; /* Added border-radius to transition */
+  transition: padding 0.3s ease-in-out, opacity 0.3s ease-in-out,
+    border-right-width 0.3s ease-in-out, border-radius 0.3s ease-in-out;
   box-sizing: border-box;
-  border-radius: 8px; /* Your previous value, you can adjust if needed */
+  border-radius: 8px;
 }
 
 .main-ui-window.middle-pane-collapsed .middle-pane {
@@ -113,9 +111,8 @@ body, html, #root {
   opacity: 0;
   pointer-events: none;
   border-right-width: 0px;
-  border-radius: 0; /* Optional: remove radius when fully collapsed */
+  border-radius: 0;
 }
-
 
 .middle-pane h2 {
   font-size: 20px;
@@ -149,7 +146,6 @@ body, html, #root {
   transition: color 0.2s ease;
 }
 
-/* Default hover: white glow */
 .middle-pane .library-category:hover,
 .middle-pane .playlist-item:hover {
   background-color: rgba(255, 255, 255, 0.08);
@@ -161,7 +157,6 @@ body, html, #root {
   color: #fff;
 }
 
-/* Active state: blue glow */
 .middle-pane .library-category.active,
 .middle-pane .playlist-item.active {
   background-color: rgba(0, 122, 255, 0.2);
@@ -173,7 +168,6 @@ body, html, #root {
   color: #007aff;
 }
 
-/* Hover on active: enhanced blue glow */
 .middle-pane .library-category.active:hover,
 .middle-pane .playlist-item.active:hover {
   background-color: rgba(0, 122, 255, 0.25);
@@ -185,7 +179,6 @@ body, html, #root {
   color: #0090ff;
 }
 
-
 .middle-pane .section-title {
   font-size: 13px;
   font-weight: 600;
@@ -196,7 +189,6 @@ body, html, #root {
   padding-left: 8px;
   white-space: nowrap;
 }
-
 
 /* Right Main Content Area */
 .right-main-content {
@@ -217,8 +209,7 @@ body, html, #root {
   position: sticky;
   top: 0;
   z-index: 10;
-  border-radius: 20px;
-  margin: 1%;
+  border-top-right-radius: 12px;
 }
 
 .content-top-bar {
@@ -260,10 +251,9 @@ body, html, #root {
   transition: box-shadow 0.3s ease;
 }
 .content-top-bar .search-in-content input:focus {
-    outline: none;
-    box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.1); /* Very subtle white glow on focus */
+  outline: none;
+  box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.1); /* Very subtle white glow on focus */
 }
-
 
 .content-top-bar .view-options-btn {
   background: none;
@@ -286,53 +276,61 @@ body, html, #root {
 }
 
 .actual-content-area h2.section-heading {
-    font-size: 22px;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 15px;
 }
 
 .song-list-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(170px, 1fr)
+  ); /* Slightly wider minmax for cards */
   gap: 20px;
 }
 
+/* Song Card Styles with Actions */
 .song-card {
   background-color: rgba(50, 55, 65, 0.3);
   backdrop-filter: blur(15px) saturate(130%);
   -webkit-backdrop-filter: blur(15px) saturate(130%);
   border-radius: 10px;
-  cursor: pointer;
   text-align: left;
-  transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Explicit transitions */
+  transition: transform 0.3s ease, background-color 0.3s ease,
+    border-color 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 4px 12px rgba(0,0,0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
-
 .song-card:hover {
   transform: translateY(-4px) scale(1.02);
   background-color: rgba(60, 65, 75, 0.45);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), /* Existing depth shadow */
-              0 0 25px 5px rgba(255, 255, 255, 0.1); /* Very subtle large white glow */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25),
+    0 0 25px 5px rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.1);
 }
-
 .song-card-thumbnail {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  border-radius: 6px 6px 0 0; /* Rounded top corners */
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
-
 .song-card:hover .song-card-thumbnail {
-    transform: scale(1.03);
+  transform: scale(1.03);
 }
-
+.song-card-info {
+  padding: 10px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
 .song-card .song-title {
   font-size: 14px;
   font-weight: 500;
@@ -341,14 +339,51 @@ body, html, #root {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
-
 .song-card .song-artist {
   font-size: 12px;
   color: #b0b0b0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: auto;
+}
+
+.song-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.song-card-actions button {
+  background: transparent;
+  border: none;
+  color: #909090;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: color 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.song-card-actions button:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.song-card-actions button .fa-heart.fas {
+  color: #e91e63;
+}
+.song-card-actions button .fa-heart.far:hover {
+  color: #e91e63;
 }
 
 /* Custom scrollbar for panes (Webkit browsers) */
