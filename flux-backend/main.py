@@ -1,67 +1,58 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
-from ytmusicapi import YTMusic
 from yt_dlp import YoutubeDL
+from youtube_search import YoutubeSearch
 
 app = Flask(__name__)
 CORS(app)
 
-ytmusic = YTMusic()  
+
+def parse_duration(duration_str):
+    try:
+        parts = duration_str.split(':')
+        if len(parts) == 2:
+            minutes = int(parts[0])
+            seconds = int(parts[1])
+            return minutes * 60 + seconds
+        elif len(parts) == 3:
+            hours = int(parts[0])
+            minutes = int(parts[1])
+            seconds = int(parts[2])
+            return hours * 3600 + minutes * 60 + seconds
+        else:
+            return 0
+    except:
+        return 0
 
 @app.route('/api/search')
 def search():
     query = request.args.get('query', '')
-    platform = request.args.get('platform', 'ytmusic')  # default to ytmusic
-
     if not query:
         return jsonify([])
 
     try:
+        raw_results = YoutubeSearch(query, max_results=20).to_dict()
         results = []
 
-        if platform == 'ytmusic':
-            search_results = ytmusic.search(query, filter='songs', limit=10)
-            for item in search_results:
-                if item['resultType'] != 'song':
-                    continue
-                results.append({
-                    'title': item.get('title'),
-                    'videoId': item.get('videoId'),
-                    'artist': ', '.join([artist['name'] for artist in item.get('artists', [])]),
-                    'album': item.get('album', {}).get('name', ''),
-                    'duration': item.get('duration'),
-                    'thumbnail': item.get('thumbnails', [{}])[-1].get('url', '')
-                })
+        for video in raw_results:
+            duration_str = video.get('duration', '')
+            duration_sec = parse_duration(duration_str)
 
-        elif platform == 'youtube':
-            ydl_opts = {
-                'format': 'bestaudio/best',
-                'noplaylist': True,
-                'quiet': True,
-                'default_search': 'ytsearch',
-                'extract_flat': False,
-            }
-            with YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(f"ytsearch5:{query}", download=False)
-                entries = info.get('entries', [])
-                for entry in entries:
-                    duration = entry.get('duration', 0)
-                    if duration >= 60:  # skip Shorts
-                        results.append({
-                            'title': entry.get('title'),
-                            'videoId': entry.get('id'),
-                            'duration': duration,
-                            'thumbnail': entry.get('thumbnail'),
-                            'artist': entry.get('uploader'),
-                        })
-        else:
-            return jsonify({'error': 'Unsupported platform'}), 400
+            if duration_sec < 100:  
+                continue
+
+            results.append({
+                'title': video.get('title'),
+                'videoId': video.get('id'),
+                'thumbnail': f"https://i.ytimg.com/vi/{video.get('id')}/hqdefault.jpg",
+                'artist': video.get('channel'),
+                'duration': duration_str
+            })
 
         return jsonify(results)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/stream')
 def stream():
@@ -75,7 +66,7 @@ def stream():
         'format': 'bestaudio/best',
         'quiet': True,
         'no_warnings': True,
-
+        'extract_flat': False,
     }
 
     try:
@@ -87,11 +78,10 @@ def stream():
         return jsonify({'error': str(e)}), 500
 
 
-
-
 @app.route('/')
 def index():
     return "Flux Python Backend is Running"
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)

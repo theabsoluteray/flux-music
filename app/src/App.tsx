@@ -66,7 +66,7 @@ function App() {
       const res = await fetch(
         `http://localhost:5000/api/search?query=${encodeURIComponent(
           query
-        )}&platform=ytmusic`
+        )}`
       );
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data: Song[] = await res.json();
