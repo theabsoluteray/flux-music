@@ -17,6 +17,33 @@ export function useQueueManager(
   const [currentQueueIndex, setCurrentQueueIndex] = useState<number>(-1);
   const originalQueueOrder = useRef<Song[]>([]);
   const isShuffleActiveRef = useRef<boolean>(false);
+  const streamUrlCache = useRef<Map<string, string>>(new Map());
+
+  const fetchStreamUrl = async (videoId: string) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/stream?videoId=${videoId}`);
+      if (!res.ok) { 
+        const errorData = await res.json(); 
+        throw new Error(errorData.error || `HTTP error! status: ${res.status}`); 
+      }
+      const streamData: { streamUrl: string } = await res.json();
+      streamUrlCache.current.set(videoId, streamData.streamUrl);
+      return streamData.streamUrl;
+    } catch (error) {
+      console.error('Error fetching stream URL:', error);
+      return null;
+    }
+  };
+
+  const preCacheStreamUrls = async (songs: Song[]) => {
+    // Pre-fetch first 5 songs' stream URLs
+    const songsToCache = songs.slice(0, 5);
+    for (const song of songsToCache) {
+      if (!streamUrlCache.current.has(song.videoId)) {
+        fetchStreamUrl(song.videoId);
+      }
+    }
+  };
 
   const playSong = useCallback(async (songToPlay: Song, indexInList?: number, playFromNewList?: Song[]) => {
     setIsBuffering(true);
@@ -37,6 +64,9 @@ export function useQueueManager(
         }
         const foundIndex = newQueue.findIndex(s => s.videoId === songToPlay.videoId);
         songIndexInNewQueue = foundIndex !== -1 ? foundIndex : (newQueue.length > 0 ? 0 : -1);
+        
+        // Pre-cache stream URLs for the new queue
+        preCacheStreamUrls(newQueue);
     } else if (indexInList !== undefined && newQueue[indexInList]?.videoId === songToPlay.videoId) { 
         songIndexInNewQueue = indexInList;
     } else if (existingIndexInCurrentQueue !== -1) { 
@@ -72,17 +102,19 @@ export function useQueueManager(
     const finalSongObject = {...songForPlayerState, lyrics: lyricsResult || "Lyrics not available for this track."};
     setCurrentSong(finalSongObject);
 
-    setTimeout(async () => { // Simulated buffering
-      try {
-        const res = await fetch(`http://localhost:5000/api/stream?videoId=${songForPlayerState.videoId}`);
-        if (!res.ok) { const errorData = await res.json(); throw new Error(errorData.error || `HTTP error! status: ${res.status}`); }
-        const streamData: { streamUrl: string } = await res.json();
-        setAudioSrc(streamData.streamUrl);
-      } catch (error) {
-        setAudioSrc('');
-        setCurrentSong(prev => prev ? {...prev, lyrics: prev.lyrics || "Error loading stream." } : {...finalSongObject, lyrics: "Error loading stream." });
-      } finally { setIsBuffering(false); }
-    }, 1000);
+    // Check cache first for stream URL
+    let streamUrl = streamUrlCache.current.get(songForPlayerState.videoId);
+    if (!streamUrl) {
+      streamUrl = await fetchStreamUrl(songForPlayerState.videoId);
+    }
+
+    if (streamUrl) {
+      setAudioSrc(streamUrl);
+    } else {
+      setAudioSrc('');
+      setCurrentSong(prev => prev ? {...prev, lyrics: prev.lyrics || "Error loading stream." } : {...finalSongObject, lyrics: "Error loading stream." });
+    }
+    setIsBuffering(false);
   }, [queue, currentQueueIndex, likedSongs]);
 
   const playNextInQueue = useCallback(() => {
@@ -107,6 +139,10 @@ export function useQueueManager(
       if (prevQueue.find(s => s.videoId === song.videoId)) return prevQueue;
       const newQueue = [...prevQueue, song];
       if (!isShuffleActiveRef.current) originalQueueOrder.current = [...newQueue];
+      // Pre-cache the stream URL for the added song
+      if (!streamUrlCache.current.has(song.videoId)) {
+        fetchStreamUrl(song.videoId);
+      }
       return newQueue;
     });
   };
@@ -117,6 +153,10 @@ export function useQueueManager(
       const insertAtIndex = currentQueueIndex >= 0 && currentQueueIndex < newQueue.length ? currentQueueIndex + 1 : newQueue.length;
       newQueue.splice(insertAtIndex, 0, song);
       if (!isShuffleActiveRef.current) originalQueueOrder.current = [...newQueue];
+      // Pre-cache the stream URL for the song to be played next
+      if (!streamUrlCache.current.has(song.videoId)) {
+        fetchStreamUrl(song.videoId);
+      }
       return newQueue;
     });
   };

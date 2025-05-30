@@ -18,7 +18,6 @@ interface PlayerProps {
 
 const Player: React.FC<PlayerProps> = React.memo(
   ({
-    // Wrapped in React.memo
     currentSong,
     audioSrc,
     isBuffering,
@@ -45,11 +44,9 @@ const Player: React.FC<PlayerProps> = React.memo(
 
     const [isPlayerVisible, setIsPlayerVisible] = useState<boolean>(false);
     const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
-    const [showLyricsPane, setShowLyricsPaneInternal] =
-      useState<boolean>(false);
+    const [showLyricsPane, setShowLyricsPaneInternal] = useState<boolean>(false);
     const [showQueueList, setShowQueueList] = useState<boolean>(false);
-    const [isShuffleActivePlayer, setIsShuffleActivePlayer] =
-      useState<boolean>(false); // Local UI state for shuffle button
+    const [isShuffleActivePlayer, setIsShuffleActivePlayer] = useState<boolean>(false);
     const [isRepeat, setIsRepeat] = useState<"off" | "one" | "all">("off");
     const [currentLyricIndex, setCurrentLyricIndex] = useState<number>(-1);
     const loadedAudioVideoId = useRef<string | null>(null);
@@ -114,12 +111,12 @@ const Player: React.FC<PlayerProps> = React.memo(
       audioElement.addEventListener("pause", handlePause);
       setIsPlaying(
         !audioElement.paused && audioElement.readyState > 0 && !!audioSrc
-      ); // Initial sync
+      );
       return () => {
         audioElement.removeEventListener("play", handlePlay);
         audioElement.removeEventListener("pause", handlePause);
       };
-    }, [audioSrc]); // Re-attach if audioSrc changes fundamentally
+    }, [audioSrc]);
 
     useEffect(() => {
       if (audioRef.current) audioRef.current.volume = volume;
@@ -180,7 +177,7 @@ const Player: React.FC<PlayerProps> = React.memo(
       (e?: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
         if (e && "stopPropagation" in e) e.stopPropagation();
         if (!audioRef.current) return;
-        if (isBuffering) return; // Don't allow play/pause toggle during buffering
+        if (isBuffering) return;
 
         if (!audioSrc && currentSong) {
           const songIndex = queue.findIndex(
@@ -787,6 +784,7 @@ const Player: React.FC<PlayerProps> = React.memo(
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleOnEnded}
+            autoPlay
           />
         </footer>
 
