@@ -520,6 +520,7 @@ const Player: React.FC<PlayerProps> = React.memo(
                           onPlayNext(isShuffleActivePlayer);
                         }}
                       >
+   
                         <i className="fas fa-step-forward"></i>
                       </button>
                       <button

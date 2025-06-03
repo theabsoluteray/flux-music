@@ -105,7 +105,7 @@ export function useQueueManager(
     // Check cache first for stream URL
     let streamUrl = streamUrlCache.current.get(songForPlayerState.videoId);
     if (!streamUrl) {
-      streamUrl = await fetchStreamUrl(songForPlayerState.videoId);
+      streamUrl = (await fetchStreamUrl(songForPlayerState.videoId)) ?? undefined;
     }
 
     if (streamUrl) {
