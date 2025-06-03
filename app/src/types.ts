@@ -7,7 +7,8 @@ export interface Song {
   duration?: number | string;
   thumbnail: string;
   lyrics?: string | LyricLine[]; 
-  isLiked?: boolean; // Optional, will be derived/added in App.tsx
+  isLiked?: boolean;
+  streamUrl?: string; // Optional, will be derived/added in App.tsx
 }
 
 export interface LyricLine {
