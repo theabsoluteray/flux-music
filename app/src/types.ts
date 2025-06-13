@@ -1,4 +1,5 @@
 // src/types.ts
+// in types.ts
 export interface Song {
   videoId: string;
   title: string;
@@ -6,10 +7,11 @@ export interface Song {
   album?: string;
   duration?: number | string;
   thumbnail: string;
-  lyrics?: string | LyricLine[]; 
   isLiked?: boolean;
-  streamUrl?: string; // Optional, will be derived/added in App.tsx
+  lyrics?: string | LyricLine[] | null; 
+  streamUrl?: string;
 }
+
 
 export interface LyricLine {
   time: number; 
