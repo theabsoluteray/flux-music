@@ -21,33 +21,29 @@ export function useQueueManager(
 
   // Immediately fetch stream URL and cache it
   const fetchStreamUrl = useCallback(async (videoId: string) => {
-    if (streamUrlCache.current.has(videoId)) {
-      return streamUrlCache.current.get(videoId);
+  if (streamUrlCache.current.has(videoId)) {
+    return streamUrlCache.current.get(videoId);
+  }
+
+  const streamUrl = `http://localhost:5000/api/stream_direct?videoId=${videoId}`;
+  // Optionally test the URL (HEAD request to verify it's reachable)
+  try {
+    const res = await fetch(streamUrl, { method: "HEAD" });
+    if (res.ok) {
+      streamUrlCache.current.set(videoId, streamUrl);
+      return streamUrl;
     }
-    try {
-      const res = await fetch(`http://localhost:5000/api/stream?videoId=${videoId}`);
-      const data = await res.json();
-      streamUrlCache.current.set(videoId, data.streamUrl);
-      return data.streamUrl;
-    } catch {
-      return null;
-    }
-  }, []);
+    return null;
+  } catch {
+    return null;
+  }
+}, []);
+
 
   // Preload stream URLs ahead of time (eager caching)
-  const preCacheStreamUrls = useCallback(async (songs: Song[]) => {
-    await Promise.all(
-      songs.slice(0, 20).map(async song => {
-        if (!streamUrlCache.current.has(song.videoId)) {
-          await fetchStreamUrl(song.videoId);
-        }
-      })
-    );
-  }, [fetchStreamUrl]);
-
-  const cacheSearchResults = (songs: Song[]) => {
-    preCacheStreamUrls(songs);
-  };
+  // Remove preCacheStreamUrls and cacheSearchResults logic
+  // Remove all calls to preCacheStreamUrls
+  // Only fetch stream URL in playSong and addToQueue/playSongNext as needed
 
   const playSong = useCallback(async (song: Song, index?: number, newList?: Song[]) => {
     const cachedUrl = streamUrlCache.current.get(song.videoId);
@@ -59,7 +55,7 @@ export function useQueueManager(
     if (newList) {
       originalQueueOrder.current = [...newList];
       if (isShuffleActiveRef.current) newQueue = shuffleArray(newQueue);
-      preCacheStreamUrls(newQueue);
+      // Only fetch stream URL in playSong and addToQueue/playSongNext as needed
     }
 
     let songIndex = index ?? newQueue.findIndex(s => s.videoId === song.videoId);
@@ -79,7 +75,7 @@ export function useQueueManager(
     const streamUrl = cachedUrl ?? await fetchStreamUrl(song.videoId);
     setAudioSrc(streamUrl || '');
     setIsBuffering(false);
-  }, [queue, currentQueueIndex, likedSongs, fetchStreamUrl, preCacheStreamUrls]);
+  }, [queue, currentQueueIndex, likedSongs, fetchStreamUrl]);
 
   const playNextInQueue = useCallback(() => {
     if (!queue.length) return;
@@ -139,6 +135,6 @@ export function useQueueManager(
     addToQueue,
     playSongNext,
     handleShuffleToggleApp,
-    cacheSearchResults,
+    // cacheSearchResults, // Removed as per edit hint
   };
 }

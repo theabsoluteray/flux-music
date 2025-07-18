@@ -2,21 +2,113 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_compress import Compress
 from yt_dlp import YoutubeDL
-import time
 from youtube_search import YoutubeSearch
 from concurrent.futures import ThreadPoolExecutor
+import threading
+import time
+import json
+import os
+import atexit
 
 app = Flask(__name__)
 CORS(app)
 Compress(app)
 
-# Simple in-memory stream cache
-stream_cache = {}
-CACHE_DURATION = 300  # 5 minutes
 executor = ThreadPoolExecutor(max_workers=4)
+CACHE_FILE = "stream_cache.json"
+CACHE_DURATION = 300  # 5 minutes
+stream_cache = {}
+first_chunk_cache = {}
 
+# Load cache on startup
+def load_cache():
+    global stream_cache
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r") as f:
+                data = json.load(f)
+                stream_cache = {k: (v[0], v[1]) for k, v in data.items()}
+                print(f"Loaded {len(stream_cache)} cached URLs")
+        except Exception as e:
+            print(f"[Cache Load Error] {e}")
+
+# Save cache on exit
+def save_cache():
+    try:
+        with open(CACHE_FILE, "w") as f:
+            json.dump({k: [v[0], v[1]] for k, v in stream_cache.items()}, f)
+    except Exception as e:
+        print(f"[Cache Save Error] {e}")
+
+# Periodically clean expired entries
+def clean_expired_cache():
+    now = time.time()
+    expired = [k for k, (_, expiry) in stream_cache.items() if expiry < now]
+    for k in expired:
+        del stream_cache[k]
+
+    # Schedule again after 5 min
+    threading.Timer(300, clean_expired_cache).start()
+
+load_cache()
+atexit.register(save_cache)
+clean_expired_cache()
+
+
+
+from flask import Response, send_file
+import requests
+from io import BytesIO
+
+@app.route('/api/stream_direct')
+def stream_direct():
+    video_id = request.args.get("videoId")
+    if not video_id:
+        return jsonify({"error": "Missing videoId"}), 400
+
+    stream_url = fetch_stream_url(video_id)
+    if not stream_url:
+        return jsonify({"error": "Failed to fetch stream URL"}), 500
+
+    chunk_size = int(request.args.get("chunkSize", 4096))
+    range_header = request.headers.get('Range', None)
+    headers = {
+        "User-Agent": request.headers.get("User-Agent")
+    }
+    if range_header:
+        headers["Range"] = range_header  # Forward the Range header
+
+    try:
+        r = requests.get(stream_url, headers=headers, stream=True, timeout=10)
+        content_type = r.headers.get('Content-Type', 'audio/mpeg')
+        content_length = r.headers.get('Content-Length')
+        status_code = r.status_code if range_header else 200
+
+        def get_first_chunk():
+            if stream_url in first_chunk_cache:
+                return first_chunk_cache[stream_url]
+            chunk = next(r.iter_content(chunk_size=chunk_size))
+            first_chunk_cache[stream_url] = chunk
+            return chunk
+
+        def generate():
+            first_chunk = get_first_chunk()
+            yield first_chunk
+            for chunk in r.iter_content(chunk_size=chunk_size):
+                if chunk != first_chunk:
+                    yield chunk
+
+        resp = Response(generate(), status=status_code, content_type=content_type)
+        if range_header and "Content-Range" in r.headers:
+            resp.headers['Content-Range'] = r.headers['Content-Range']
+            resp.headers['Accept-Ranges'] = 'bytes'
+            resp.headers['Content-Length'] = r.headers.get('Content-Length')
+        return resp
+    except Exception as e:
+        return jsonify({"error": f"Streaming failed: {e}"}), 500
+
+# Core stream fetch function
 def fetch_stream_url(video_id):
-    """Fetch and cache the stream URL for a given video ID."""
     if video_id in stream_cache:
         url, expiry = stream_cache[video_id]
         if time.time() < expiry:
@@ -32,12 +124,13 @@ def fetch_stream_url(video_id):
             url = info['url']
             stream_cache[video_id] = (url, time.time() + CACHE_DURATION)
             return url
-    except:
+    except Exception as e:
+        print(f"[Stream Error] {video_id}: {e}")
         return None
 
+# 🎧 Get stream URL
 @app.route('/api/stream')
 def stream():
-    """Returns stream URL for a single videoId"""
     video_id = request.args.get("videoId")
     if not video_id:
         return jsonify({"error": "Missing videoId"}), 400
@@ -47,9 +140,9 @@ def stream():
         return jsonify({"streamUrl": stream_url})
     return jsonify({"error": "Failed to fetch stream URL"}), 500
 
+# 🔍 Search and preload
 @app.route('/api/search')
 def search_youtube():
-    """Search and auto-pre-cache stream URLs for all 10 songs."""
     query = request.args.get("query")
     if not query:
         return jsonify({"error": "Missing query parameter"}), 400
@@ -78,14 +171,14 @@ def search_youtube():
             "duration": duration
         })
 
-    # ⏩ Background pre-caching stream URLs (non-blocking)
     def preload_streams():
         for song in songs:
             fetch_stream_url(song['videoId'])
 
     executor.submit(preload_streams)
-
     return jsonify(songs)
+
+# 🔁 Similar songs (for autoplay)
 @app.route('/api/similar')
 def similar():
     title = request.args.get("title")
@@ -117,6 +210,6 @@ def similar():
         })
     return jsonify(songs)
 
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
-1

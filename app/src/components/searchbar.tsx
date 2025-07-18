@@ -62,7 +62,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, cacheSearchResults }) =
 
     setTypingTimeout(timeout);
     return () => clearTimeout(timeout);
-  }, [query, fetchSearchResults]);
+  }, [query, fetchSearchResults, typingTimeout]);
 
   return (
     <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
@@ -78,3 +78,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, cacheSearchResults }) =
 };
 
 export default SearchBar;
+

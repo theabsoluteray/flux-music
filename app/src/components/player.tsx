@@ -239,6 +239,18 @@ const Player: React.FC<PlayerProps> = React.memo(
       if (newLyricIndex !== currentLyricIndex)
         setCurrentLyricIndex(newLyricIndex);
     }, [currentTime, currentSong, isPlaying]);
+    useEffect(() => {
+  if (!currentSong || !audioRef.current) return;
+
+  if (audioSrc) {
+    audioRef.current.src = audioSrc;
+    audioRef.current
+      .play()
+      .catch((err) => {
+        console.error("Playback failed:", err);
+      });
+  }
+}, [currentSong, audioSrc]);
 
     useEffect(() => {
       if (

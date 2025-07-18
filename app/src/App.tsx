@@ -1,10 +1,8 @@
 // src/App.tsx
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Player from './components/player';
 import { Song } from './types';
-import { fetchLyrics } from './utils/lyricsService';
-import { shuffleArray } from './utils/arrayUtils';
 import { useLikedSongs } from './hooks/useLikedSongs';    
 import { useQueueManager } from './hooks/useQueueManager'; 
 
@@ -75,7 +73,7 @@ function App() {
     if (!query.trim()) { setSongsFromSearch([]); return; }
     setActiveView('search-results');
     try {
-      const res = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(query)}&platform=ytmusic`);
+      const res = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data: Song[] = await res.json();
       setSongsFromSearch(data);
